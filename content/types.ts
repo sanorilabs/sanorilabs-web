@@ -73,6 +73,8 @@ export interface Content {
     nextProject: string;
     viewAsGrid: string;
     viewAsWheel: string;
+    /** Texto alternativo de una portada. {name} es el nombre del proyecto. */
+    coverAlt: string;
     previous: string;
     next: string;
     links: string;

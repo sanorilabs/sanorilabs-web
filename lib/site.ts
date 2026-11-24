@@ -17,6 +17,8 @@ interface PageMeta {
   title?: string;
   description?: string;
   noindex?: boolean;
+  /** Imagen para compartir propia. Sin ella, la general del idioma. */
+  image?: { url: string; alt: string };
 }
 
 /** Metadata de una página: canonical, hreflang y Open Graph. */
@@ -27,14 +29,20 @@ export function pageMetadata({
   title,
   description,
   noindex,
+  image: ownImage,
 }: PageMeta): Metadata {
   const t = getContent(lang);
   const other: Lang = lang === "es" ? "en" : "es";
   const fullTitle = title ? `${title} — ${t.meta.siteName}` : t.meta.title;
   const fullDescription = description ?? t.meta.description;
   const esPath = lang === "es" ? path : altPath;
-  // La misma imagen para todas las páginas de un idioma (app/og/*.png).
-  const image = { url: `/og/${lang}.png`, ...ogSize, alt: ogAlt(lang) };
+  // Cada proyecto comparte su portada; el resto, la imagen general del
+  // idioma (app/og/*.png).
+  const image = {
+    url: ownImage?.url ?? `/og/${lang}.png`,
+    ...ogSize,
+    alt: ownImage?.alt ?? ogAlt(lang),
+  };
 
   return {
     title: fullTitle,

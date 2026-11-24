@@ -2,8 +2,12 @@ import type { StatusKey } from "./types";
 
 /**
  * Datos de cada proyecto que no cambian con el idioma:
- * código, casilla, estado, portada y enlaces.
+ * código, casilla, estado, marca, portada y enlaces.
  * Los textos viven en es.ts y en.ts.
+ *
+ * Sanori Labs es neutro (papel, tinta, cobalto); el color lo pone cada
+ * proyecto con su marca. Tras cambiar un color, un logo o un sitio, corre
+ * `node scripts/generate-covers.mjs` para rehacer las portadas.
  */
 
 /** Negocios propios. */
@@ -19,9 +23,22 @@ interface BaseMeta {
   tileLabel: string;
   name: string;
   status: StatusKey;
-  /** Portada en /public. Reemplaza el archivo para cambiarla. */
+  /** Marca del proyecto: de aquí sale todo el color del sitio. */
+  brand: {
+    /** Color principal: fondo de la portada y tinte de la rueda. */
+    color: string;
+    /** Logo en /public (SVG o PNG transparente). */
+    logo: string;
+    /** Proporción del logo (ancho / alto), para reservar su espacio. */
+    logoRatio: number;
+    /** Si el logo no se lee sobre `color`, va sobre una placa de este color. */
+    logoPlate?: string;
+  };
+  /** Portada en /public (1600×1000). La genera scripts/generate-covers.mjs. */
   cover: string;
-  /** Sin label = se muestra como "Ver sitio". */
+  /** Imagen para compartir (1200×630). La genera el mismo script. */
+  og: string;
+  /** El primero es el sitio del proyecto. Sin label = "Ver sitio". */
   links: { label?: string; href: string }[];
 }
 
@@ -47,7 +64,13 @@ export const projects: ProjectMeta[] = [
     tileLabel: "Casora",
     name: "Casora",
     status: "production",
-    cover: "/projects/casora.png",
+    brand: {
+      color: "#C9622E",
+      logo: "/projects/logos/casora.png",
+      logoRatio: 1165 / 279,
+    },
+    cover: "/projects/casora.webp",
+    og: "/projects/og/casora.jpg",
     links: [
       { label: "casoramx.com", href: "https://casoramx.com" },
       { label: "App Store", href: "https://apps.apple.com/mx/app/id6810853902" },
@@ -65,7 +88,13 @@ export const projects: ProjectMeta[] = [
     tileLabel: "Nola",
     name: "Nola",
     status: "validating",
-    cover: "/projects/nola.png",
+    brand: {
+      color: "#0A0A0A",
+      logo: "/projects/logos/nola.png",
+      logoRatio: 748 / 334,
+    },
+    cover: "/projects/nola.webp",
+    og: "/projects/og/nola.jpg",
     links: [{ label: "nolamx.com", href: "https://www.nolamx.com/" }],
   },
   {
@@ -75,7 +104,15 @@ export const projects: ProjectMeta[] = [
     tileLabel: "P&L",
     name: "P&L Grupo Comercial",
     status: "delivered",
-    cover: "/projects/pl-grupo-comercial.png",
+    brand: {
+      color: "#FE6F02",
+      logo: "/projects/logos/pl-grupo-comercial.png",
+      logoRatio: 1200 / 482,
+      // El "&" del logo es naranja: sobre el naranja de marca desaparece.
+      logoPlate: "#0B0B0C",
+    },
+    cover: "/projects/pl-grupo-comercial.webp",
+    og: "/projects/og/pl-grupo-comercial.jpg",
     links: [{ href: "https://plgrupocomercial.com.mx" }],
   },
   {
@@ -85,7 +122,13 @@ export const projects: ProjectMeta[] = [
     tileLabel: "Permil",
     name: "Permil",
     status: "delivered",
-    cover: "/projects/permil.png",
+    brand: {
+      color: "#1E3866",
+      logo: "/projects/logos/permil.png",
+      logoRatio: 1000 / 336,
+    },
+    cover: "/projects/permil.webp",
+    og: "/projects/og/permil.jpg",
     links: [{ href: "https://permil.com.mx" }],
   },
 ];

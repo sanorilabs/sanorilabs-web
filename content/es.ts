@@ -41,6 +41,7 @@ export const es: Content = {
     nextProject: "Siguiente proyecto",
     viewAsGrid: "Ver como grilla",
     viewAsWheel: "Ver como rueda",
+    coverAlt: "Sitio de {name} en escritorio y celular",
     previous: "Anterior",
     next: "Siguiente",
     links: "Enlaces",

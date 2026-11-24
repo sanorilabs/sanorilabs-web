@@ -3,7 +3,7 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import { notFound } from "next/navigation";
 import { ProjectView } from "@/components/project/ProjectView";
 import { getProject, projects } from "@/content/projects";
-import { projectDescription } from "@/lib/projects";
+import { coverAlt, projectDescription } from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
 import { pageMetadata } from "@/lib/site";
 
@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     altPath: projectPath("en", project.slug),
     title: project.name,
     description: projectDescription("es", project),
+    image: { url: project.og, alt: coverAlt("es", project) },
   });
 }
 

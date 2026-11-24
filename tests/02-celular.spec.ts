@@ -32,6 +32,23 @@ test.describe("2. Celular", () => {
     }
   });
 
+  test("el abanico del hero no existe ni descarga sus imágenes", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await scrollThrough(page);
+    await page.waitForTimeout(1000);
+
+    await expect(page.locator(".hero-fan")).toBeHidden();
+    const loaded = await page
+      .locator(".hero-fan img")
+      .evaluateAll((images) =>
+        images.filter((image) => (image as HTMLImageElement).naturalWidth > 0)
+          .length,
+      );
+    expect(loaded).toBe(0);
+  });
+
   test("el menú se abre y se cierra", async ({ page }) => {
     await page.goto("/");
     const menu = page.locator("header details");

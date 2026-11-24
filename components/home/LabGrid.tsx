@@ -11,7 +11,12 @@ import { ViewProjectLabel } from "@/components/ui/ViewProjectLabel";
 import { getContent } from "@/content";
 import { projects, type ProjectMeta } from "@/content/projects";
 import type { Lang } from "@/content/types";
-import { projectKind, projectSummary, tileProps } from "@/lib/projects";
+import {
+  coverAlt,
+  projectKind,
+  projectSummary,
+  tileProps,
+} from "@/lib/projects";
 import { projectPath, routes } from "@/lib/routes";
 import { ViewToggle } from "./ViewToggle";
 
@@ -47,6 +52,7 @@ function ProjectCell({
       <CoverTransition slug={project.slug} source="grid">
         <ProjectCover
           project={project}
+          alt={coverAlt(lang, project)}
           sizes="(min-width: 768px) 560px, 100vw"
         />
       </CoverTransition>

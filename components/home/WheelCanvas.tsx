@@ -32,7 +32,7 @@ function wrapAngle(angle: number): number {
   return wrapped === -Math.PI ? Math.PI : wrapped;
 }
 
-/** 1 en la posición activa (derecha), 0 a un cuarto de vuelta o más. */
+/** 1 en la posición activa (al frente), 0 a un cuarto de vuelta o más. */
 function activeWeight(angle: number): number {
   const x = Math.max(0, 1 - Math.abs(angle) / (Math.PI / 2));
   return x * x * (3 - 2 * x);
@@ -86,24 +86,28 @@ interface RingProps {
   onPick: (index: number) => void;
 }
 
+/**
+ * Anillo vertical, como una noria vista de frente: la portada activa queda
+ * al frente y a tamaño real; la anterior asoma por arriba y la siguiente por
+ * abajo, más lejos, así que se ven algo más chicas y atenuadas.
+ */
 function Ring({ covers, progress, hidden, onPick }: RingProps) {
   const size = useThree((state) => state.size);
   const gl = useThree((state) => state.gl);
   const textures = useTextures(covers);
   const groups = useRef<(Group | null)[]>([]);
-  const materials = useRef<(MeshBasicMaterial | null)[]>([]);
+  const veils = useRef<(MeshBasicMaterial | null)[]>([]);
   const rotation = useRef<number | null>(null);
-  const cameraHeight = useRef(0);
+  const cameraKey = useRef("");
   const count = covers.length;
 
-  const layout = useMemo(
-    () => wheelLayout(size.width, size.height),
-    [size.width, size.height],
-  );
+  const layout = useMemo(() => wheelLayout(size.width), [size.width]);
 
   useFrame((state, delta) => {
-    // En z = 0, una unidad de la escena es un px de pantalla.
-    if (cameraHeight.current !== state.size.height) {
+    // En z = 0, una unidad de la escena es un px de pantalla. El centro de la
+    // perspectiva se desplaza al centro del anillo, que no es el del lienzo.
+    const key = `${state.size.width}x${state.size.height}`;
+    if (cameraKey.current !== key) {
       const view = state.camera as PerspectiveCamera;
       view.position.set(0, 0, CAMERA_Z);
       view.fov = MathUtils.radToDeg(
@@ -111,8 +115,16 @@ function Ring({ covers, progress, hidden, onPick }: RingProps) {
       );
       view.near = 10;
       view.far = CAMERA_Z * 3;
+      view.setViewOffset(
+        state.size.width,
+        state.size.height,
+        -layout.centerX,
+        0,
+        state.size.width,
+        state.size.height,
+      );
       view.updateProjectionMatrix();
-      cameraHeight.current = state.size.height;
+      cameraKey.current = key;
     }
 
     const target = progress.current * (count - 1);
@@ -125,11 +137,11 @@ function Ring({ covers, progress, hidden, onPick }: RingProps) {
 
     for (let index = 0; index < count; index++) {
       const group = groups.current[index];
-      const material = materials.current[index];
-      if (!group || !material) continue;
+      const veil = veils.current[index];
+      if (!group || !veil) continue;
 
-      // Ángulo 0 = posición activa (derecha). Al avanzar, cada portada sube
-      // desde abajo hasta la derecha y sigue hacia arriba.
+      // Ángulo 0 = al frente. La siguiente portada (ángulo negativo) espera
+      // abajo y sube al frente al avanzar; la anterior se va por arriba.
       const angle = wrapAngle(((rotation.current - index) * TAU) / count);
       const weight = activeWeight(angle);
       const rest = 1 - weight;
@@ -138,17 +150,13 @@ function Ring({ covers, progress, hidden, onPick }: RingProps) {
 
       group.visible = hidden.current !== index;
       group.position.set(
-        layout.rx * Math.cos(angle),
-        layout.ry * Math.sin(angle) + float,
-        -80 * rest,
+        0,
+        layout.radius * Math.sin(angle) + float,
+        -layout.radius * (1 - Math.cos(angle)),
       );
-      group.rotation.set(
-        Math.sin(angle) * wheel.tilt * rest,
-        -Math.cos(angle) * wheel.tilt * rest,
-        -Math.sin(angle) * 0.1 * rest,
-      );
-      group.scale.setScalar(MathUtils.lerp(wheel.inactiveScale, 1, weight));
-      material.opacity = MathUtils.lerp(wheel.inactiveOpacity, 1, weight);
+      // Cada portada mira un poco hacia afuera del anillo.
+      group.rotation.set(-angle * wheel.tilt, 0, 0);
+      veil.opacity = wheel.inactiveDim * rest;
     }
   });
 
@@ -173,7 +181,7 @@ function Ring({ covers, progress, hidden, onPick }: RingProps) {
             gl.domElement.style.cursor = "";
           }}
         >
-          {/* Marco de 1px, para que una portada clara no se pierda en el papel. */}
+          {/* Marco de 1px alrededor de la portada. */}
           <mesh position={[0, 0, -1]}>
             <planeGeometry args={[layout.coverW + 2, layout.coverH + 2]} />
             <meshBasicMaterial color={GRID} />
@@ -182,12 +190,22 @@ function Ring({ covers, progress, hidden, onPick }: RingProps) {
             <planeGeometry args={[layout.coverW, layout.coverH]} />
             <meshBasicMaterial
               key={textures[index] ? "cover" : "empty"}
-              ref={(node) => {
-                materials.current[index] = node;
-              }}
               color={textures[index] ? "#ffffff" : PAPER}
               map={textures[index]}
+            />
+          </mesh>
+          {/* Velo color papel: atenúa las portadas que no están al frente
+              sin volverlas transparentes (no se ven unas a través de otras). */}
+          <mesh position={[0, 0, 1]}>
+            <planeGeometry args={[layout.coverW + 2, layout.coverH + 2]} />
+            <meshBasicMaterial
+              ref={(node) => {
+                veils.current[index] = node;
+              }}
+              color={PAPER}
               transparent
+              opacity={0}
+              depthWrite={false}
             />
           </mesh>
         </group>

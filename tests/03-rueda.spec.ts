@@ -1,5 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { projects } from "../content/projects";
+import { wheel } from "../lib/motion";
 import { projectPath } from "../lib/routes";
 import { collectScripts, content, expect, hasThree, test } from "./site";
 
@@ -57,8 +58,10 @@ test.describe("3. Rueda (escritorio)", () => {
     const box = (await page.locator(".wheel-stage canvas").boundingBox())!;
     await page.mouse.move(box.x + 200, box.y + 150);
 
-    // Cada proyecto ocupa el 60% del alto de la ventana.
-    const step = Math.round(page.viewportSize()!.height * 0.6);
+    // Cada proyecto ocupa wheel.stepVh % del alto de la ventana.
+    const step = Math.round(
+      (page.viewportSize()!.height * wheel.stepVh) / 100,
+    );
     await page.mouse.wheel(0, step);
     await expect(activeName(page)).toHaveText(projects[1].name);
 
@@ -138,6 +141,41 @@ test.describe("3. Rueda (escritorio)", () => {
     for (const cell of await cells.all()) {
       await expect(cell).toContainText(label);
     }
+  });
+
+  test("el fondo toma un tinte suave del color de cada proyecto", async ({
+    page,
+  }) => {
+    await openWheel(page);
+    const stage = page.locator(".wheel-stage .sticky");
+    const next = page.getByRole("button", { name: t.ui.next });
+    const paper = "rgb(242, 241, 236)";
+    const seen = new Set<string>();
+
+    for (const [index, project] of projects.entries()) {
+      if (index > 0) {
+        await clickAt(page, next);
+        await expect(activeName(page)).toHaveText(project.name);
+      }
+      // Deja terminar la transición del tinte antes de leer el color.
+      await page.waitForTimeout(wheel.tintMs + 200);
+      const background = await stage.evaluate(
+        (node) => getComputedStyle(node).backgroundColor,
+      );
+      expect(background).not.toBe(paper);
+
+      // Es un tinte, no el color pleno: cada canal queda cerca del papel.
+      const channels = background.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+      const srgb = background.startsWith("color(srgb")
+        ? channels.map((value) => value * 255)
+        : channels;
+      [242, 241, 236].forEach((base, i) => {
+        expect(Math.abs(srgb[i] - base)).toBeLessThanOrEqual(30);
+      });
+      seen.add(background);
+    }
+    // Cada proyecto deja su propio tinte.
+    expect(seen.size).toBe(projects.length);
   });
 
   test('"Ver como grilla" y "Ver como rueda" alternan las vistas', async ({

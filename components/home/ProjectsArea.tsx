@@ -1,7 +1,7 @@
 import { getContent } from "@/content";
 import { projects } from "@/content/projects";
 import type { Lang } from "@/content/types";
-import { projectKind, tileProps } from "@/lib/projects";
+import { projectKind, projectTeaser, tileProps } from "@/lib/projects";
 import { projectPath, routes } from "@/lib/routes";
 import { LabGrid } from "./LabGrid";
 import { WheelStage, type WheelItem } from "./WheelStage";
@@ -27,14 +27,19 @@ export function ProjectsArea({ lang }: { lang: Lang }) {
     code: project.code,
     kind: projectKind(lang, project),
     name: project.name,
+    teaser: projectTeaser(lang, project),
     status: project.status,
     statusLabel: t.status[project.status],
     tile: tileProps(project),
     cover: coverSrc(project.cover),
+    brand: project.brand,
   }));
 
   return (
-    <div id={anchors.projects} className="projects-area mt-24 md:mt-32">
+    <div
+      id={anchors.projects}
+      className="projects-area mt-24 md:mt-32 lg:mt-20"
+    >
       <WheelStage
         items={items}
         projectsAnchor={anchors.projects}

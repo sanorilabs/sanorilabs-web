@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -29,6 +30,8 @@ const WheelCanvas = dynamic(() => import("./WheelCanvas"), { ssr: false });
 
 /** Alto del menú fijo, en px (h-16). La rueda se queda pegada debajo. */
 const HEADER = 64;
+/** Alto del logo dentro de su placa de color, en px. */
+const LOGO_HEIGHT = 30;
 
 export interface WheelItem {
   slug: string;
@@ -38,11 +41,19 @@ export interface WheelItem {
   /** Giro del cliente (solo casos). */
   kind?: string;
   name: string;
+  /** Una línea que describe el proyecto. */
+  teaser: string;
   status: StatusKey;
   statusLabel: string;
   tile: { number?: string; code?: string; label: string };
   /** Portada ya optimizada, para la textura y la transición. */
   cover: string;
+  brand: {
+    color: string;
+    logo: string;
+    logoRatio: number;
+    logoPlate?: string;
+  };
 }
 
 interface WheelStageProps {
@@ -71,10 +82,14 @@ const dotColor: Record<StatusKey, string> = {
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
+const arrowButton =
+  "flex size-10 cursor-pointer items-center justify-center border border-ink font-mono transition-colors duration-200 hover:bg-ink hover:text-paper disabled:cursor-default disabled:border-grid disabled:text-muted disabled:hover:bg-transparent disabled:hover:text-muted";
+
 /**
  * Rueda de proyectos: las portadas giran en un anillo 3D con el scroll o al
- * arrastrar, y en el centro aparece el proyecto activo. El texto y los
- * enlaces son HTML normal; el canvas solo dibuja las portadas.
+ * arrastrar. A la izquierda va el proyecto activo (casilla, logo, nombre,
+ * descripción, estado y enlace) y el fondo toma un tinte de su color.
+ * El texto y los enlaces son HTML normal; el canvas solo dibuja las portadas.
  */
 export function WheelStage({
   items,
@@ -214,8 +229,8 @@ export function WheelStage({
     };
   }, [enabled, count, scrollToY]);
 
-  // El canvas se descarga cuando el navegador está libre y solo dibuja
-  // mientras la rueda está en pantalla.
+  // El canvas (y con él las texturas) se descarga cuando el navegador está
+  // libre y solo dibuja mientras la rueda está en pantalla.
   useEffect(() => {
     if (!enabled) return;
     const wrap = wrapRef.current;
@@ -310,6 +325,11 @@ export function WheelStage({
       <div
         ref={stickyRef}
         className="sticky top-16 h-[calc(100vh-4rem)] cursor-grab touch-pan-y select-none overflow-hidden active:cursor-grabbing"
+        style={{
+          // Tinte muy suave del color del proyecto activo sobre el papel.
+          backgroundColor: `color-mix(in srgb, ${current.brand.color} ${wheel.tintPercent}%, var(--color-paper))`,
+          transition: `background-color ${wheel.tintMs}ms ease`,
+        }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -347,7 +367,7 @@ export function WheelStage({
           </ViewTransition>
         )}
 
-        <div className="container-site pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between pt-8">
+        <div className="container-site pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between pt-6">
           <h2 className="label">
             <span className="font-medium text-cobalt">
               {current.type === "exp" ? "EXP" : "CLI"}
@@ -357,7 +377,8 @@ export function WheelStage({
               · {current.type === "exp" ? labels.exp : labels.cli}
             </span>
           </h2>
-          <span className="pointer-events-auto">
+          {/* Con fondo: el botón queda encima de la portada que asoma arriba. */}
+          <span className="pointer-events-auto bg-paper">
             <ViewToggle
               to="grid"
               label={labels.viewAsGrid}
@@ -373,7 +394,7 @@ export function WheelStage({
               <li
                 key={item.slug}
                 aria-hidden={isActive ? undefined : true}
-                className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+                className="absolute inset-0"
                 style={{
                   opacity: isActive ? 1 : 0,
                   visibility: isActive ? "visible" : "hidden",
@@ -381,45 +402,69 @@ export function WheelStage({
                   transition: `opacity ${wheel.labelMs}ms ease, transform ${wheel.labelMs}ms ease, visibility 0s linear ${isActive ? 0 : wheel.labelMs}ms`,
                 }}
               >
-                <SnTile {...item.tile} size={80} decorative />
-                <p className="label mt-5">
-                  <span className="font-medium">{item.code}</span>
-                  {item.kind && (
-                    <span className="text-muted"> · {item.kind}</span>
-                  )}
-                </p>
-                <h3 className="mt-2 max-w-[20rem] text-4xl">{item.name}</h3>
-                <p
-                  className={`label mt-3 inline-flex items-center gap-2 ${
-                    item.status === "delivered" ? "text-muted" : "text-ink"
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`text-[0.7em] ${dotColor[item.status]}`}
-                  >
-                    ●
-                  </span>
-                  {item.statusLabel}
-                </p>
-                <div className="pointer-events-auto mt-6">
-                  <Magnetic>
-                    <Link
-                      href={item.href}
-                      prefetch={true}
-                      className={buttonClass("primary")}
-                      onClick={() => prepareGhost(index)}
+                {/* Dos columnas: el texto y, a la derecha, el hueco que ocupa
+                    la portada activa del canvas. */}
+                <div className="container-site wheel-columns h-full">
+                  <div className="max-w-xl">
+                    <div className="flex items-stretch gap-3">
+                      <SnTile {...item.tile} size={72} decorative />
+                      <span
+                        className="flex h-[72px] items-center px-5"
+                        style={{
+                          backgroundColor:
+                            item.brand.logoPlate ?? item.brand.color,
+                        }}
+                      >
+                        <Image
+                          src={item.brand.logo}
+                          alt=""
+                          width={Math.round(LOGO_HEIGHT * item.brand.logoRatio)}
+                          height={LOGO_HEIGHT}
+                        />
+                      </span>
+                    </div>
+
+                    <p className="label mt-6">
+                      <span className="font-medium">{item.code}</span>
+                      {item.kind && (
+                        <span className="text-muted"> · {item.kind}</span>
+                      )}
+                    </p>
+                    <h3 className="mt-2 text-5xl xl:text-6xl">{item.name}</h3>
+                    <p className="mt-4 line-clamp-3 text-lg">{item.teaser}</p>
+                    <p
+                      className={`label mt-4 inline-flex items-center gap-2 ${
+                        item.status === "delivered" ? "text-muted" : "text-ink"
+                      }`}
                     >
-                      <ViewProjectLabel text={labels.viewProject} />
-                    </Link>
-                  </Magnetic>
+                      <span
+                        aria-hidden="true"
+                        className={`text-[0.7em] ${dotColor[item.status]}`}
+                      >
+                        ●
+                      </span>
+                      {item.statusLabel}
+                    </p>
+                    <div className="pointer-events-auto mt-7 w-fit">
+                      <Magnetic>
+                        <Link
+                          href={item.href}
+                          prefetch={true}
+                          className={buttonClass("primary")}
+                          onClick={() => prepareGhost(index)}
+                        >
+                          <ViewProjectLabel text={labels.viewProject} />
+                        </Link>
+                      </Magnetic>
+                    </div>
+                  </div>
                 </div>
               </li>
             );
           })}
         </ul>
 
-        <div className="container-site pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between pb-8">
+        <div className="container-site pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-6 pb-6">
           <p className="label text-muted">
             <span className="text-ink">
               {String(active + 1).padStart(2, "0")}
@@ -432,18 +477,18 @@ export function WheelStage({
               aria-label={labels.previous}
               disabled={active === 0}
               onClick={() => goTo(active - 1)}
-              className="flex size-10 cursor-pointer items-center justify-center border border-ink font-mono transition-colors duration-200 hover:bg-ink hover:text-paper disabled:cursor-default disabled:border-grid disabled:text-muted disabled:hover:bg-transparent disabled:hover:text-muted"
+              className={arrowButton}
             >
-              <span aria-hidden="true">←</span>
+              <span aria-hidden="true">↑</span>
             </button>
             <button
               type="button"
               aria-label={labels.next}
               disabled={active === count - 1}
               onClick={() => goTo(active + 1)}
-              className="flex size-10 cursor-pointer items-center justify-center border border-ink font-mono transition-colors duration-200 hover:bg-ink hover:text-paper disabled:cursor-default disabled:border-grid disabled:text-muted disabled:hover:bg-transparent disabled:hover:text-muted"
+              className={arrowButton}
             >
-              <span aria-hidden="true">→</span>
+              <span aria-hidden="true">↓</span>
             </button>
           </div>
         </div>

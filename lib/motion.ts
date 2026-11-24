@@ -62,7 +62,7 @@ export const decode = {
 /** Rueda de proyectos de la home. */
 export const wheel = {
   /** Scroll que dura cada proyecto, en % del alto de la ventana. */
-  stepVh: 60,
+  stepVh: 45,
   /** Qué tan rápido alcanza el anillo su posición (más alto = más rápido). */
   damping: 6,
   /** Tras este tiempo sin scroll (ms), la rueda se asienta en un proyecto. */
@@ -73,16 +73,25 @@ export const wheel = {
   jumpDuration: 1,
   /** Px de arrastre que equivalen a un px de scroll. */
   dragFactor: 1.4,
-  /** Tamaño y opacidad de las portadas que no están activas. */
-  inactiveScale: 0.66,
-  inactiveOpacity: 0.55,
-  /** Giro 3D máximo de las portadas no activas, en radianes. */
-  tilt: 0.5,
+  /** Cuánto se atenúan (hacia el papel) las portadas que no están al frente. */
+  inactiveDim: 0.5,
+  /** Inclinación de las portadas que no están al frente (0 = ninguna). */
+  tilt: 0.22,
   /** Amplitud (px) y velocidad del flotado en reposo. */
-  floatPx: 7,
+  floatPx: 5,
   floatSpeed: 0.7,
   /** Cambio de texto del proyecto activo, en ms. */
   labelMs: 350,
+  /** Tinte del fondo con el color del proyecto activo: % sobre el papel. */
+  tintPercent: 8,
+  /** Transición del tinte al cambiar de proyecto, en ms. */
+  tintMs: 400,
+};
+
+/** Abanico de portadas del hero (escritorio). */
+export const fan = {
+  /** Lo que tardan las portadas en separarse al pasar el ratón, en ms. */
+  spreadMs: 500,
 };
 
 /**

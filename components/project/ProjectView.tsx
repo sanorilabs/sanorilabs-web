@@ -11,7 +11,12 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getContent } from "@/content";
 import { getNextProject, type ProjectMeta } from "@/content/projects";
 import type { Lang } from "@/content/types";
-import { projectKind, projectSummary, tileProps } from "@/lib/projects";
+import {
+  coverAlt,
+  projectKind,
+  projectSummary,
+  tileProps,
+} from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
 import { CoverTransition } from "./CoverTransition";
 import { PressCheck } from "./PressCheck";
@@ -170,6 +175,7 @@ export function ProjectView({
           <div className="border border-grid">
             <ProjectCover
               project={project}
+              alt={coverAlt(lang, project)}
               sizes="(min-width: 1184px) 1120px, 100vw"
               eager
             />

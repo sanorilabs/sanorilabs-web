@@ -41,6 +41,7 @@ export const en: Content = {
     nextProject: "Next project",
     viewAsGrid: "View as grid",
     viewAsWheel: "View as wheel",
+    coverAlt: "{name} website on desktop and mobile",
     previous: "Previous",
     next: "Next",
     links: "Links",

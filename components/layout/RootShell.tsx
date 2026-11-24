@@ -4,7 +4,7 @@ import { MotionScript } from "@/components/motion/MotionScript";
 import { getContent } from "@/content";
 import type { Lang } from "@/content/types";
 import { plexMono, plexSans } from "@/lib/fonts";
-import { loader, press, transition } from "@/lib/motion";
+import { fan, loader, press, transition } from "@/lib/motion";
 import { Footer } from "./Footer";
 import { Loader } from "./Loader";
 import { Nav } from "./Nav";
@@ -15,6 +15,7 @@ const transitionVars = {
   "--loader-count": `${loader.totalMs - loader.exitMs}ms`,
   "--loader-exit": `${loader.exitMs}ms`,
   "--press-check": `${press.checkMs}ms`,
+  "--fan-spread": `${fan.spreadMs}ms`,
   "--vt-morph": `${transition.morphMs}ms`,
   "--vt-morph-ease": transition.morphEase,
   "--vt-page-out": `${transition.pageOutMs}ms`,

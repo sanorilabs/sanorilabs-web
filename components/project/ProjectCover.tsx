@@ -7,6 +7,8 @@ import { tileProps } from "@/lib/projects";
 
 interface ProjectCoverProps {
   project: ProjectMeta;
+  /** Texto alternativo de la portada. */
+  alt: string;
   /** Anchos para next/image. */
   sizes: string;
   /** true en el encabezado de la página del proyecto. */
@@ -19,6 +21,7 @@ interface ProjectCoverProps {
  */
 export function ProjectCover({
   project,
+  alt,
   sizes,
   eager = false,
 }: ProjectCoverProps) {
@@ -29,7 +32,7 @@ export function ProjectCover({
       {hasFile ? (
         <Image
           src={project.cover}
-          alt=""
+          alt={alt}
           fill
           sizes={sizes}
           loading={eager ? "eager" : "lazy"}
