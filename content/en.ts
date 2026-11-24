@@ -195,6 +195,11 @@ export const en: Content = {
     email: "Email",
   },
 
+  profiles: {
+    github: "Sebastián Noriega on GitHub",
+    linkedin: "Sebastián Noriega on LinkedIn",
+  },
+
   footer: {
     tagline: "Build. Test. Ship.",
     copyright: "© 2026 Sanori Labs",

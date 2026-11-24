@@ -114,6 +114,11 @@ export interface Content {
     title: string;
     email: string;
   };
+  /** Nombre accesible de los enlaces a perfiles (lectores de pantalla). */
+  profiles: {
+    github: string;
+    linkedin: string;
+  };
   footer: {
     tagline: string;
     copyright: string;

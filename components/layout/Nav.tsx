@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { SnTile } from "@/components/brand/SnTile";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { getContent } from "@/content";
+import { links } from "@/content/links";
 import type { Lang } from "@/content/types";
 import { routes } from "@/lib/routes";
 import { LangLinks } from "./LangLinks";
@@ -20,6 +21,17 @@ export function Nav({ lang }: { lang: Lang }) {
     { label: t.nav.about, href: r.about },
     { label: t.nav.contact, href: `${r.about}#${r.anchors.contact}` },
   ];
+
+  // Enlace discreto al código, pensado para quien evalúa el trabajo.
+  const github = links.github ? (
+    <a
+      href={links.github}
+      target="_blank"
+      rel="noopener noreferrer me"
+    >
+      GitHub<span aria-hidden="true"> ↗</span>
+    </a>
+  ) : null;
 
   // Mientras no se conoce la ruta, el ES/EN apunta a la home del otro idioma.
   const langSwitch = (
@@ -59,6 +71,11 @@ export function Nav({ lang }: { lang: Lang }) {
                 </Link>
               </li>
             ))}
+            {github && (
+              <li className="label text-muted underline-offset-4 hover:text-cobalt hover:underline">
+                {github}
+              </li>
+            )}
             <li>{langSwitch}</li>
           </ul>
         </nav>
@@ -78,6 +95,11 @@ export function Nav({ lang }: { lang: Lang }) {
                     </Link>
                   </li>
                 ))}
+                {github && (
+                  <li className="label border-t border-grid text-muted [&>a]:block [&>a]:py-4">
+                    {github}
+                  </li>
+                )}
               </ul>
             </nav>
           </MobileMenu>

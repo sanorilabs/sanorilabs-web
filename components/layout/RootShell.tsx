@@ -8,6 +8,7 @@ import { fan, loader, press, transition } from "@/lib/motion";
 import { Footer } from "./Footer";
 import { Loader } from "./Loader";
 import { Nav } from "./Nav";
+import { PersonJsonLd } from "./PersonJsonLd";
 
 // Las duraciones del loader, la transición de página y el press check
 // viven en lib/motion.ts; aquí pasan al CSS, que es quien anima.
@@ -59,6 +60,7 @@ export function RootShell({
           {children}
         </main>
         <Footer lang={lang} />
+        <PersonJsonLd />
       </body>
     </html>
   );

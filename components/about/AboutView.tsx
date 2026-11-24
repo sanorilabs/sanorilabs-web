@@ -1,8 +1,9 @@
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealLines } from "@/components/motion/RevealLines";
 import { Rule } from "@/components/motion/Rule";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { getContent } from "@/content";
-import { contactLinks, links } from "@/content/links";
+import { contactLinks, links, profileLinks } from "@/content/links";
 import type { Lang, Rich } from "@/content/types";
 import { routes } from "@/lib/routes";
 import { Telemetry } from "./Telemetry";
@@ -27,6 +28,7 @@ function RichText({ parts }: { parts: Rich }) {
 export function AboutView({ lang }: { lang: Lang }) {
   const t = getContent(lang);
   const social = contactLinks();
+  const profiles = profileLinks();
 
   return (
     <>
@@ -70,6 +72,19 @@ export function AboutView({ lang }: { lang: Lang }) {
           >
             {links.email}
           </a>
+
+          {profiles.length > 0 && (
+            <ul className="mt-10 flex flex-wrap gap-4">
+              {profiles.map((profile) => (
+                <li key={profile.id}>
+                  <ButtonLink href={profile.href} variant="secondary">
+                    {profile.label}
+                    <span aria-hidden="true">&nbsp;↗</span>
+                  </ButtonLink>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {social.length > 0 && (
             <ul className="label mt-10 flex flex-wrap gap-x-8 gap-y-3">

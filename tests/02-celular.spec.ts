@@ -66,6 +66,14 @@ test.describe("2. Celular", () => {
     await expect(menu).not.toHaveAttribute("open", "");
     await expect(aboutLink).toBeHidden();
 
+    // GitHub va dentro del menú colapsado, no en la barra.
+    await button.click();
+    const github = menu.locator('a[href="https://github.com/sebonorai"]');
+    await expect(github).toBeVisible();
+    await expect(github).toHaveText("GitHub ↗");
+    await button.click();
+    await expect(github).toBeHidden();
+
     // Elegir un enlace navega y deja el menú cerrado.
     await button.click();
     await aboutLink.click();
