@@ -1,19 +1,41 @@
 # Sanori Labs · sanorilabs.com
 
-Sitio de Sanori Labs, la marca con la que Sebastián Noriega firma sus proyectos: negocios propios (Casora, Nola) y sitios web para clientes. Está en español (`/`) y en inglés (`/en`).
+Portfolio site for **Sanori Labs**, the studio name I sign my projects with: my own products ([Casora](https://casoramx.com), [Nola](https://www.nolamx.com)) and websites built for local businesses in Mexico. Bilingual: Spanish at `/`, English at `/en`.
 
-Hecho con Next.js (App Router), TypeScript y Tailwind CSS. Es un sitio estático, sin base de datos ni backend, y se despliega en Vercel.
+**Live:** [sanorilabs.com](https://sanorilabs.com)
 
-## Desarrollo
+![Sanori Labs home page, desktop](docs/screenshot-desktop.png)
 
-Requiere Node.js 20 o más reciente.
+## What it is
+
+A fully static marketing and portfolio site: no database, no backend, deployed on Vercel. The point of the project was to hold a motion-heavy design to the same bar as a plain document on accessibility and speed:
+
+- Scroll-driven animation (GSAP, Lenis) and a three.js scene, with a `prefers-reduced-motion` path and a usable no-JavaScript fallback.
+- Fully keyboard-navigable; accessibility is tested with axe, not just checked by hand.
+- Mobile-first layout, verified on desktop, iPhone 14 and Pixel 7 viewports.
+- Content lives in plain TypeScript files, so adding a project or changing a link doesn't touch components.
+
+## Stack
+
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| Styling | Tailwind CSS 4 |
+| Motion / 3D | GSAP, Lenis, three.js with `@react-three/fiber` |
+| Tests | Playwright + axe-core |
+| Performance audits | Lighthouse (`npm run lighthouse`) |
+| Hosting | Vercel |
+
+## Run it locally
+
+Requires Node.js 20 or newer.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-El sitio queda en http://localhost:3000. Antes de publicar:
+Before shipping a change:
 
 ```bash
 npm run build
@@ -26,37 +48,40 @@ npm run lint
 npm test
 ```
 
-Construye el sitio, lo levanta en el puerto 3100 y corre los tests de `tests/` con Playwright y axe: rutas, celular, rueda, movimiento reducido, sin JavaScript, teclado, accesibilidad, enlaces, textos y loader. Usa el Chrome instalado en el equipo; no descarga navegadores.
+This builds the site, serves it on port 3100 and runs the Playwright suite in `tests/` against three projects (desktop, iPhone 14, Pixel 7). The specs cover routing, mobile layout, wheel/scroll behavior, reduced motion, no-JavaScript rendering, keyboard navigation, axe accessibility checks, link integrity, copy, and the loader.
 
-## Lighthouse
+To run one spec: `npx playwright test tests/<file>.spec.ts`.
 
-Con el build de producción levantado en el puerto 3100:
+## Performance and accessibility
 
-```bash
-npm run build
-npm run start -- -p 3100
-```
+Lighthouse, mobile profile, against the production site:
 
-y en otra terminal:
+| Category | Score |
+|---|---|
+| Performance | 92–100 (varies run to run) |
+| Accessibility | 100 |
+| Best Practices | 100 |
+| SEO | 100 |
 
-```bash
-npm run lighthouse
-```
+Reproduce with `npm run lighthouse` (reports are written to `lighthouse-reports/`, which is git-ignored).
 
-Mide `/`, `/proyectos/casora` y `/sobre-mi` en móvil, con loader y sin loader, y guarda los informes en `lighthouse-reports/`.
+## Editing content
 
-## Dónde se edita cada cosa
+| What | Where |
+|---|---|
+| Contact and social links | `content/links.ts` |
+| Project covers | `public/projects/` (1600×1000 PNG; replace a file with the same name to swap it) |
+| Animation durations and easings | `lib/motion.ts` |
+| Brand colors | `app/globals.css` |
 
-| Qué | Dónde |
-| --- | --- |
-| Textos en español | `content/es.ts` |
-| Textos en inglés | `content/en.ts` (misma estructura que `es.ts`) |
-| Proyectos: código, casilla, estado, portada y sus enlaces | `content/projects.ts` |
-| Correo, WhatsApp, Instagram, LinkedIn y GitHub | `content/links.ts` |
-| Portadas de los proyectos | `public/projects/` (PNG de 1600×1000) |
-| Duraciones y easings de las animaciones | `lib/motion.ts` |
-| Colores de la identidad | `app/globals.css` |
+In `content/links.ts`, an empty string (`""`) hides that link. While there is no WhatsApp number set, the "Get a quote" button opens email instead. `node scripts/generate-covers.mjs` regenerates the placeholder covers.
 
-En `content/links.ts`, un enlace vacío (`""`) no se muestra. Mientras no haya número de WhatsApp, el botón "Cotiza tu sitio" abre el correo.
+## Notes
 
-Para cambiar una portada, reemplaza su PNG en `public/projects/` con el mismo nombre. `node scripts/generate-covers.mjs` vuelve a crear las portadas de muestra.
+- Built with AI assistance (Claude Code). Design direction, content and review are mine; the commit history shows where it was used.
+- Project covers and client logos in `public/projects/` belong to their respective owners and are included to show the work, not for reuse.
+- No license is granted for the code at this time (all rights reserved). If you'd like to reuse something, get in touch.
+
+## Contact
+
+Sebastián Noriega · [sanorilabs.com](https://sanorilabs.com) · [LinkedIn](https://www.linkedin.com/in/sebastianoriegao)
