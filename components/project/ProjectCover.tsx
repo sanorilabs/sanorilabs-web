@@ -38,7 +38,8 @@ export function ProjectCover({
         />
       ) : (
         <div className="flex h-full items-center justify-center">
-          <SnTile {...tileProps(project)} size={160} decorative />
+          {/* Aquí la casilla va sola, en lugar de la imagen: se anuncia. */}
+          <SnTile {...tileProps(project)} size={160} name={project.name} />
         </div>
       )}
     </div>

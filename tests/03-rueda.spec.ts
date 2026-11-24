@@ -122,6 +122,24 @@ test.describe("3. Rueda (escritorio)", () => {
     });
   }
 
+  test('"Ver proyecto" lleva flecha en la rueda y en la grilla', async ({
+    page,
+  }) => {
+    await openWheel(page);
+    const label = `${t.ui.viewProject} →`;
+
+    await expect(
+      page.locator(".wheel-stage li:not([aria-hidden]) a"),
+    ).toHaveText(label);
+
+    await clickAt(page, page.getByRole("button", { name: t.ui.viewAsGrid }));
+    const cells = page.locator(".lab-grid li");
+    await expect(cells).toHaveCount(projects.length);
+    for (const cell of await cells.all()) {
+      await expect(cell).toContainText(label);
+    }
+  });
+
   test('"Ver como grilla" y "Ver como rueda" alternan las vistas', async ({
     page,
   }) => {

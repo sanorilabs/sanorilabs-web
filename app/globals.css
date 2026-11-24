@@ -110,10 +110,64 @@ html[data-loader="on"] .site-loader {
     var(--loader-count) forwards;
 }
 
+/* La casilla mide 1em de lado: todo lo de dentro va en em y en %, con las
+   mismas proporciones que SnTile (retícula de 100). */
 .loader-tile {
-  width: clamp(6.5rem, 22vw, 9rem);
-  height: auto;
+  position: relative;
+  width: 1em;
+  height: 1em;
+  font-size: clamp(6.5rem, 22vw, 9rem);
+  line-height: 1;
+}
+
+.loader-tile svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   overflow: visible;
+}
+
+/* Las letras las pone el CSS: no existen como texto en el HTML. */
+.loader-step {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 0.1em;
+  white-space: nowrap;
+}
+
+.loader-step::before {
+  content: attr(data-text);
+}
+
+.loader-number {
+  top: 13%;
+  left: 11%;
+  font-weight: 500;
+  color: var(--color-cobalt);
+}
+
+.loader-labs {
+  top: 13%;
+  right: 11%;
+}
+
+.loader-symbol {
+  top: 33%;
+  right: 0;
+  left: 0;
+  font-family: var(--font-sans);
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.loader-name {
+  top: 80%;
+  right: 0;
+  left: 0;
+  text-align: center;
 }
 
 .loader-frame {

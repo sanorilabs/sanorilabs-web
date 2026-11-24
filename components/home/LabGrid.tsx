@@ -7,6 +7,7 @@ import { RevealLines } from "@/components/motion/RevealLines";
 import { CoverTransition } from "@/components/project/CoverTransition";
 import { ProjectCover } from "@/components/project/ProjectCover";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { ViewProjectLabel } from "@/components/ui/ViewProjectLabel";
 import { getContent } from "@/content";
 import { projects, type ProjectMeta } from "@/content/projects";
 import type { Lang } from "@/content/types";
@@ -69,7 +70,7 @@ function ProjectCell({
           </h3>
           {summary && <p className="mt-2 text-muted">{summary}</p>}
           <p aria-hidden="true" className="label mt-auto pt-4 text-cobalt">
-            {t.ui.viewProject} →
+            <ViewProjectLabel text={t.ui.viewProject} />
           </p>
         </div>
       </div>

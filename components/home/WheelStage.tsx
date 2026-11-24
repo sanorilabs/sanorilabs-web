@@ -15,6 +15,7 @@ import {
 import { SnTile } from "@/components/brand/SnTile";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { buttonClass } from "@/components/ui/ButtonLink";
+import { ViewProjectLabel } from "@/components/ui/ViewProjectLabel";
 import type { StatusKey } from "@/content/types";
 import { getLenis } from "@/lib/lenis-store";
 import { transition, wheel } from "@/lib/motion";
@@ -409,7 +410,7 @@ export function WheelStage({
                       className={buttonClass("primary")}
                       onClick={() => prepareGhost(index)}
                     >
-                      {labels.viewProject}
+                      <ViewProjectLabel text={labels.viewProject} />
                     </Link>
                   </Magnetic>
                 </div>
