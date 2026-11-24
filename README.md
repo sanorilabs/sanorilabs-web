@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sanori Labs · sanorilabs.com
 
-## Getting Started
+Sitio de Sanori Labs, la marca con la que Sebastián Noriega firma sus proyectos: negocios propios (Casora, Nola) y sitios web para clientes. Está en español (`/`) y en inglés (`/en`).
 
-First, run the development server:
+Hecho con Next.js (App Router), TypeScript y Tailwind CSS. Es un sitio estático, sin base de datos ni backend, y se despliega en Vercel.
+
+## Desarrollo
+
+Requiere Node.js 20 o más reciente.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El sitio queda en http://localhost:3000. Antes de publicar:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm run lint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tests
 
-## Learn More
+```bash
+npm test
+```
 
-To learn more about Next.js, take a look at the following resources:
+Construye el sitio, lo levanta en el puerto 3100 y corre los tests de `tests/` con Playwright y axe: rutas, celular, rueda, movimiento reducido, sin JavaScript, teclado, accesibilidad, enlaces, textos y loader. Usa el Chrome instalado en el equipo; no descarga navegadores.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Lighthouse
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Con el build de producción levantado en el puerto 3100:
 
-## Deploy on Vercel
+```bash
+npm run build
+npm run start -- -p 3100
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+y en otra terminal:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lighthouse
+```
+
+Mide `/`, `/proyectos/casora` y `/sobre-mi` en móvil, con loader y sin loader, y guarda los informes en `lighthouse-reports/`.
+
+## Dónde se edita cada cosa
+
+| Qué | Dónde |
+| --- | --- |
+| Textos en español | `content/es.ts` |
+| Textos en inglés | `content/en.ts` (misma estructura que `es.ts`) |
+| Proyectos: código, casilla, estado, portada y sus enlaces | `content/projects.ts` |
+| Correo, WhatsApp, Instagram, LinkedIn y GitHub | `content/links.ts` |
+| Portadas de los proyectos | `public/projects/` (PNG de 1600×1000) |
+| Duraciones y easings de las animaciones | `lib/motion.ts` |
+| Colores de la identidad | `app/globals.css` |
+
+En `content/links.ts`, un enlace vacío (`""`) no se muestra. Mientras no haya número de WhatsApp, el botón "Cotiza tu sitio" abre el correo.
+
+Para cambiar una portada, reemplaza su PNG en `public/projects/` con el mismo nombre. `node scripts/generate-covers.mjs` vuelve a crear las portadas de muestra.
